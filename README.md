@@ -1,7 +1,3 @@
-Samajh gaya Abhishek 👍
-Aapne ek **Weather Forecast App** banaya hai jo OpenWeather API se data fetch karta hai. Is project ke liye main ek simple **README.md** bana deta hoon jo aapke GitHub repo ke liye perfect hoga.
-
----
 
 Here’s your **README.md** ⬇️
 
