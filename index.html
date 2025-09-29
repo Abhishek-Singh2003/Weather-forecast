@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Weather Forecast</title>
+
+  <link rel="icon" href="https://cdn2.vectorstock.com/i/1000x1000/68/51/rain-cloud-weather-forecast-info-icon-rainy-vector-24566851.jpg" type="image/x-icon">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(to right, #6dd5ed, #2193b0);
+      color: #fff;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .container {
+      max-width: 600px;
+      margin: 100px auto;
+      padding: 20px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+    }
+    input {
+      padding: 10px;
+      width: 70%;
+      border-radius: 8px;
+      border: none;
+    }
+    button {
+      padding: 10px 15px;
+      border: none;
+      border-radius: 8px;
+      background: #ff9800;
+      color: white;
+      cursor: pointer;
+      margin-left: 8px;
+    }
+    .current {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+    .forecast {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+    .day-card {
+      background: rgba(255,255,255,0.2);
+      padding: 15px;
+      border-radius: 10px;
+      width: 100px;
+      margin: 5px;
+    }
+    .day-card h4 {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>🌤 Weather Forecast</h2>
+    <input type="text" id="cityInput" placeholder="Enter city name"/>
+    <button onclick="getWeather()">Search</button>
+
+    <div class="current" id="currentWeather"></div>
+    <div class="forecast" id="forecast"></div>
+  </div>
+
+  <script>
+    const apiKey = "513fedca8869670f99e26722b01f1040"; 
+
+    async function getWeather() {
+      const city = document.getElementById("cityInput").value;
+      if (!city) return alert("Please enter a city name");
+
+      const url = `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${apiKey}&units=metric`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.cod !== "200") {
+          document.getElementById("currentWeather").innerHTML = "City not found!";
+          document.getElementById("forecast").innerHTML = "";
+          return;
+        }
+
+        // Current weather (first item)
+        const current = data.list[0];
+        document.getElementById("currentWeather").innerHTML = `
+          <h3>${data.city.name}, ${data.city.country}</h3>
+          <p>🌡 Temp: ${current.main.temp}°C</p>
+          <p>💧 Humidity: ${current.main.humidity}%</p>
+          <p>⛅ ${current.weather[0].description}</p>
+        `;
+
+        // 5-day forecast (daily at 12:00)
+        let forecastHTML = "";
+        const dailyData = data.list.filter(item => item.dt_txt.includes("12:00:00"));
+
+        dailyData.slice(0,5).forEach(day => {
+          const date = new Date(day.dt_txt).toDateString();
+          forecastHTML += `
+            <div class="day-card">
+              <h4>${date.split(" ")[0]}</h4>
+              <p>${day.main.temp}°C</p>
+              <p>${day.weather[0].main}</p>
+            </div>
+          `;
+        });
+
+        document.getElementById("forecast").innerHTML = forecastHTML;
+
+      } catch (err) {
+        console.error(err);
+        alert("Error fetching data");
+      }
+    }
+  </script>
+</body>
+</html>
